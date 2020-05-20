@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import br.com.alura.ceep.R;
 import br.com.alura.ceep.dao.NotaDAO;
 import br.com.alura.ceep.model.Nota;
 import br.com.alura.ceep.ui.recyclerview.adapter.ListaNotasAdapter;
+import br.com.alura.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
 
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CHAVE_NOTA;
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_INSERE_NOTA;
@@ -33,6 +35,7 @@ public class ListaNotasctivity extends AppCompatActivity {
         List<Nota> todasNotas = pegaTodasNotas();
         configuraRecyclerView(todasNotas);
         configuraBotaoInsereNota();
+
     }
 
     private void configuraBotaoInsereNota() {
@@ -53,6 +56,9 @@ public class ListaNotasctivity extends AppCompatActivity {
 
     private List<Nota> pegaTodasNotas() {
         NotaDAO dao = new NotaDAO();
+        for (int i = 1; i <= 10; i++) {
+            dao.insere(new Nota("Titulo " + i, "Descricao " + i));
+        }
         return dao.todos();
     }
 
@@ -96,5 +102,12 @@ public class ListaNotasctivity extends AppCompatActivity {
     private void configuraAdapter(List<Nota> todasNotas, RecyclerView listaNotas) {
         adapter = new ListaNotasAdapter(this, todasNotas);
         listaNotas.setAdapter(adapter);
+        adapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(Nota nota) {
+                Toast.makeText(ListaNotasctivity.this,
+                        nota.getTitulo(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
