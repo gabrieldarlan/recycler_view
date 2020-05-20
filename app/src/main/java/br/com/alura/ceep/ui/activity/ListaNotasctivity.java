@@ -5,9 +5,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.Serializable;
 import java.util.List;
 
 import br.com.alura.ceep.R;
@@ -18,13 +20,15 @@ import br.com.alura.ceep.ui.recyclerview.adapter.ListaNotasAdapter;
 public class ListaNotasctivity extends AppCompatActivity {
 
     public static final String TITULO_APPBAR = "Ceep";
+    private ListaNotasAdapter adapter;
+    private List<Nota> todasNotas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_notas);
         setTitle(TITULO_APPBAR);
-        List<Nota> todasNotas = notasDeExemplo();
+        todasNotas = notasDeExemplo();
         configuraRecyclerView(todasNotas);
 
         TextView botaoInsereNota = findViewById(R.id.lista_notas_insere_nota);
@@ -33,23 +37,30 @@ public class ListaNotasctivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent iniciaFormularioNota =
                         new Intent(ListaNotasctivity.this, FormularioNotaActivity.class);
-                startActivity(iniciaFormularioNota);
+                startActivityForResult(iniciaFormularioNota, 1);
             }
         });
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == 1 && resultCode == 2 && data.hasExtra("nota")) {
+            Nota notaRecebida = (Nota) data.getSerializableExtra("nota");
+            new NotaDAO().insere(notaRecebida);
+            adapter.adiciona(notaRecebida);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     protected void onResume() {
-        NotaDAO dao = new NotaDAO();
-        List<Nota> todos = dao.todos();
-        configuraRecyclerView(todos);
         super.onResume();
     }
 
     private List<Nota> notasDeExemplo() {
         NotaDAO dao = new NotaDAO();
-        dao.insere(new Nota("Primeira nota","Descrição pequena"));
-        dao.insere(new Nota("Segunda nota","Segunda descrição maior pq sim"));
+        dao.insere(new Nota("Primeira nota", "Descrição pequena"));
+        dao.insere(new Nota("Segunda nota", "Segunda descrição maior pq sim"));
         return dao.todos();
     }
 
@@ -59,6 +70,7 @@ public class ListaNotasctivity extends AppCompatActivity {
     }
 
     private void configuraAdapter(List<Nota> todasNotas, RecyclerView listaNotas) {
-        listaNotas.setAdapter(new ListaNotasAdapter(this, todasNotas));
+        adapter = new ListaNotasAdapter(this, todasNotas);
+        listaNotas.setAdapter(adapter);
     }
 }
