@@ -11,7 +11,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".ui.activity.FormularioNotaActivity"></activity>
         <activity android:name=".ui.activity.FormularioNotaActivity" />
-        <activity android:name=".ui.activity.ListaNotasctivity">
+        <activity android:name=".ui.activity.ListaNotasActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
