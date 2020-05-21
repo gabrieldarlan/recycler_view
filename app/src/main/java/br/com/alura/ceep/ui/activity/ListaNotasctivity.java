@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.Serializable;
 import java.util.List;
 
 import br.com.alura.ceep.R;
@@ -19,6 +20,7 @@ import br.com.alura.ceep.ui.recyclerview.adapter.ListaNotasAdapter;
 import br.com.alura.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
 
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CHAVE_NOTA;
+import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_ALTERA_NOTA;
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_INSERE_NOTA;
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CODIGO_RESULTADO_NOTA_CRIADA;
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.TITULO_APPBAR;
@@ -68,6 +70,13 @@ public class ListaNotasctivity extends AppCompatActivity {
             Nota notaRecebida = (Nota) data.getSerializableExtra(CHAVE_NOTA);
             adicionaNota(notaRecebida);
         }
+
+        if (requestCode == CODIGO_REQUISICAO_ALTERA_NOTA &&
+                resultCode == CODIGO_RESULTADO_NOTA_CRIADA && temNota(data)) {
+            Nota notaRecebida = (Nota) data.getSerializableExtra(CHAVE_NOTA);
+            Toast.makeText(this, notaRecebida.getTitulo(), Toast.LENGTH_SHORT).show();
+        }
+
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -105,8 +114,11 @@ public class ListaNotasctivity extends AppCompatActivity {
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(Nota nota) {
-                Toast.makeText(ListaNotasctivity.this,
-                        nota.getTitulo(), Toast.LENGTH_SHORT).show();
+                Intent abreFormularioComNota =
+                        new Intent(ListaNotasctivity.this,
+                                FormularioNotaActivity.class);
+                abreFormularioComNota.putExtra(CHAVE_NOTA, nota);
+                startActivityForResult(abreFormularioComNota, CODIGO_REQUISICAO_ALTERA_NOTA);
             }
         });
     }
